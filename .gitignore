@@ -1,0 +1,4 @@
+/.venv/
+/ticu.egg-info/
+/.token
+*.log
