@@ -3,9 +3,13 @@
 import click
 
 import ticu.app
+import ticu.utils
 
 
 app = ticu.app.App()
+
+def already_running(pid):
+  raise RuntimeError(f"This bot is already running - pid: {pid}.")
 
 @click.group()
 def cli():
@@ -18,4 +22,9 @@ def cli():
 def run(token, pidfile, dev=False):
   app.token = token
   app.pidfile = pidfile
-  app.run(dev=dev)
+
+  if dev:
+    app.run(dev=dev)
+  else:
+    with ticu.utils.PIDManager(pidfile, on_exists_callback=already_running):
+      app.run(dev=dev)

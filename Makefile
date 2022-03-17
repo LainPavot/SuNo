@@ -22,4 +22,13 @@ dev:
 	@$(ACTIVATE) && ticu run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
 
 stop:
-	@kill $$(cat $(PIDFILE))
+	@if [ -f "$(PIDFILE)" ];then \
+		echo "[pid=$$(cat $(PIDFILE))] Killing TiCu" ; \
+		kill $$(cat $(PIDFILE)) ; \
+	else \
+		echo "Not running." ; \
+	fi
+
+kill:
+	@echo "Killing all instances of TiCu"
+	@-killall ticu
