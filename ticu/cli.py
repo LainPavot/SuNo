@@ -4,9 +4,17 @@ import click
 
 import ticu.app
 import ticu.utils
+import ticu.modules.test_module
 
 
 app = ticu.app.App()
+
+modules = [
+  ticu.modules.test_module.TestModule
+]
+
+for module in modules:
+  app.register(module(app))
 
 def already_running(pid):
   raise RuntimeError(f"This bot is already running - pid: {pid}.")
