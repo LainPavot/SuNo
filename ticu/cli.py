@@ -4,13 +4,14 @@ import click
 
 import ticu.app
 import ticu.utils
-import ticu.modules.test_module
+import ticu.modules
 
 
 app = ticu.app.App()
 
 modules = [
-  ticu.modules.test_module.TestModule
+  ticu.modules.TestModule,
+  ticu.modules.NewMembers,
 ]
 
 for module in modules:
