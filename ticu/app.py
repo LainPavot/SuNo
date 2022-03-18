@@ -9,7 +9,7 @@ import discord
 import ticu.utils
 
 
-logger = ticu.utils.get_logger(__name__, filename=f"{__name__}.log", noprint=True)
+logger = ticu.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
 
 
 class App(discord.Client):
@@ -48,7 +48,7 @@ class App(discord.Client):
         break
       if result is None:
         ValueError(
-          f"The module {module.__name__} did not dispatch correctly "
+          f"The module {module.name} did not dispatch correctly "
           f"for the function {func_name}. Expected True or False, got None."
         )
 

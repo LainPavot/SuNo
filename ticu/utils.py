@@ -52,11 +52,11 @@ class PIDManager(contextlib.ContextDecorator):
 
 def get_formater():
   return logging.Formatter(
-    "[%(name)-10s-%(levelname)-5s %(asctime)s] %(message)s",
+    "[%(name)-16s-%(levelname)-5s %(asctime)s] %(message)s",
     "%Y-%m-%d %H:%M:%S"
   )
 
-def get_logger(name, filename=None, debug=False, noprint=False):
+def get_logger(name, filename=None, debug=False, noprint=True):
   logger = logging.getLogger(name)
   logger.setLevel(logging.DEBUG if debug else logging.INFO)
 
