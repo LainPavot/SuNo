@@ -4,6 +4,8 @@ VENV_DIR = .venv
 ACTIVATE = . ./$(VENV_DIR)/bin/activate
 PIDFILE = $(abspath .pid)
 
+flags=
+
 install: $(VENV_DIR)
 	@$(ACTIVATE) && python3 -m pip install --upgrade pip
 	@$(ACTIVATE) && pip install -e .
@@ -20,6 +22,9 @@ start:
 
 dev:
 	@$(ACTIVATE) && ticu run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
+
+test:
+	@$(ACTIVATE) && pytest -v -s --show-capture=all $(flags)
 
 stop:
 	@if [ -f "$(PIDFILE)" ];then \

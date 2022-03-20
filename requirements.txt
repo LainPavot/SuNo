@@ -1,3 +1,5 @@
 click
 discord.py
 sqlalchemy
+dpytest
+pytest

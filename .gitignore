@@ -2,3 +2,4 @@
 /ticu.egg-info/
 /.token
 *.log
+/.pytest_cache/
