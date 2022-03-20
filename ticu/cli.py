@@ -1,21 +1,26 @@
 
 
 import click
+import discord
 
 import ticu.app
 import ticu.utils
 import ticu.modules
 
 
+intents = discord.Intents.all()
+
 app = ticu.app.App()
 
 modules = [
-  ticu.modules.TestModule,
+  ticu.modules.RaidHandler,
+  ticu.modules.ExampleModule,
   ticu.modules.NewMembers,
 ]
 
 for module in modules:
-  app.register(module(app))
+  module = module(app)
+  app.register(module)
 
 def already_running(pid):
   raise RuntimeError(f"This bot is already running - pid: {pid}.")

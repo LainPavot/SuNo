@@ -34,14 +34,56 @@ class TiCuModule:
     )
     self._app = app
     self.dev = False
+    self.command_info.setdefault("help", dict(help="Obtenir l'aide de ce module"))
+    self.check_integrity()
 
-  def set_dev_mode(self):
+  def check_integrity(self):
+    missing_method = ", ".join(
+      f"_command_{command}"
+      for command in self.command_info
+      if not hasattr(self, f"_command_{command}")
+    )
+    if not missing_method:
+      return
+    self.early_failure()
+    message = "\n".join((
+      f"Integrity problems has been encountered in the {self.name} module.",
+      f"Missing methods: {missing_method}. Please implement them."
+    ))
+    self.logger.error(message)
+    raise ValueError(f"Some integrity checks failed.\n{message}")
+
+  def early_failure(self):
+    ticu.utils.add_stdout_handler(self.logger)
+    self.logger.setLevel(logging.DEBUG)
+    self.logger.debug("Early failure: logger outputs on stdout.")
+
+  @property
+  def config(self):
+    return self._app.config
+
+  @property
+  def loop(self):
+    return self._app.loop
+
+  def set_dev_mode(self, print_stdout=True):
     if not self.dev:
       self.dev = True
-      ticu.utils.add_stdout_handler(self.logger)
+      if print_stdout:
+        ticu.utils.add_stdout_handler(self.logger)
+      self.logger.setLevel(logging.DEBUG)
+      self.logger.debug(f"Dev mode activated for module {self.name}.")
 
   async def on_ready(self, *args, **kwargs):
-    self.logger.info(f"Module {self.name} loaded and ready.")
+    self.logger.debug(f"Module {self.name} loaded and ready.")
+    return False
+
+  async def on_message(self, message, *args, **kwargs):
+    self.logger_debug_function(f"Got message: {message.content}")
+    return await self.handle_command(message)
+
+  async def on_member_join(self, member, *args, **kwargs):
+    self.logger_debug_function(f"New member just joined: {member.name}")
     return False
 
   async def ban_member(self, member):

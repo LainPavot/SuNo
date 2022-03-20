@@ -1,12 +1,13 @@
 
 
 import asyncio
-import atexit
+import logging
 import os
 
 import discord
 
 import ticu.utils
+import ticu.config
 
 
 logger = ticu.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
@@ -16,6 +17,8 @@ class App(discord.Client):
 
   def __init__(self, *args, **kwargs):
     self._modules = []
+    self.config = ticu.config
+    self.dev = False
     super().__init__(*args, **kwargs)
 
   def register(self, module):
@@ -34,6 +37,15 @@ class App(discord.Client):
     logger.info("------")
     await self.map_modules("on_ready", args, kwargs)
 
+  async def on_message(self, message, *args, **kwargs):
+    if message.author == self.user:
+      return
+    args = (message, *args)
+    await self.map_modules("on_message", args, kwargs)
+
+  async def on_member_join(self, *args, **kwargs):
+    await self.map_modules("on_member_join", args, kwargs)
+
   async def map_modules(self, func_name, args=(), kwargs={}):
     """
     Take a function's name and parameter and call each module's function
@@ -45,16 +57,25 @@ class App(discord.Client):
       dispatcher = getattr(module, func_name)
       result = await dispatcher(*args, **kwargs)
       if result:
+        logger.debug(f"{module.name} captured the [{func_name}] event.")
         break
-      if result is None:
+      if not isinstance(result, bool):
         ValueError(
           f"The module {module.name} did not dispatch correctly "
-          f"for the function {func_name}. Expected True or False, got None."
+          f"for the function {func_name}. Expected bool, got {type(result)}."
         )
 
-  def run(self, dev=False):
-    if dev:
-      ticu.utils.add_stdout_handler(logger)
+  def set_dev_mode(self, print_stdout=True):
+    if not self.dev:
+      self.dev = True
+      if print_stdout:
+        ticu.utils.add_stdout_handler(logger)
+      logger.setLevel(logging.DEBUG)
+      logger.debug(f"Dev mode activated for client.")
       for module in self._modules:
-        module.set_dev_mode()
+        module.set_dev_mode(print_stdout=print_stdout)
+
+  def run(self, dev=False, *args, **kwargs):
+    if dev:
+      self.set_dev_mode(*args, **kwargs)
     super().run(self.token)

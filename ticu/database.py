@@ -47,6 +47,18 @@ class TipouiMember(Base):
   def __repr__(self):
     return f"<TiPouiMember(pseudo='{self.pseudo}')>"
 
+def has_member(member):
+  return False
+
+def has_auto_ban(member):
+  return False
+
+def has_auto_kick(member):
+  return False
+
+def create_member(member):
+  pass
+
 
 database_logger = ticu.utils.get_logger(
   __name__,
