@@ -11,7 +11,7 @@ import ticu.utils
 class TiCuModule:
 
   name = "TiCuModule"
-  command_prefix = "help"
+  command_prefix = name
   module_help = (
     "L'aide de ce module n'a pas été rédigée, n'hésitez pas"
     "à contacter Lainou#2122 ou tout autre personne du dev' pour la rédiger, "
@@ -130,7 +130,11 @@ class TiCuModule:
     if not content.startswith(f"!{self.command_prefix} "):
       return False
     module, command, *args = content.split(" ")
-    self.logger_debug_function(f"")
+    if command not in self.command_info:
+      return await self.send_message(
+        message.channel,
+        f"Commande inconnue: {command}"
+      )
     self.logger_debug_function(f"Command matches {self.name}:{command}.")
     await self.run_command_check_perm(message, command, tuple(args))
     return True
@@ -152,7 +156,16 @@ class TiCuModule:
     handler = getattr(self, f"_command_{command}")
     await handler(message, command, args)
 
+  def get_role(self, *args, **kwargs):
+    return self._app.get_role(*args, **kwargs)
+
   def check_perms(self, user, command):
+    command_info = self.command_info[command]
+    if not (roles := command_info.get("perms", {}).get("role")):
+      return True
+    roles = set([self.get_role(user.guild, role) for role in roles])
+    return set(user.roles) & roles
+
     return True
 
   async def _command_help(self, message, command, args):
@@ -189,11 +202,16 @@ class TiCuModule:
       f"{name}\n---\n{self.command_info[name].get('help', '')}\n"
       for name in self.command_info
     )
+    commandes_with_perm = [
+      f"{command} - {' - '.join(value.get('perms', {}).get('role', ('no perm', )))}"
+      for command, value in self.command_info.items()
+    ]
     return "\n".join((
       f"{self.name}",
       f"===",
       f"{self.module_help}",
-      "\nCommandes:\n * "+"\n * ".join(command for command in self.command_info),
+      f"\nPréfix de commande: !{self.command_prefix}",
+      "\nCommandes:\n * "+"\n * ".join(commandes_with_perm),
       f"",
       f"{commands_help}",
     ))

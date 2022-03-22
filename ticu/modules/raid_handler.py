@@ -21,10 +21,10 @@ class RaidHandler(ticu.module.TiCuModule):
     on=dict(
       help=(
         "Activer le mode raid: Désactiver les invitations, autoban les"
-        "personnes qui rejoignent le serveur."
+        " personnes qui rejoignent le serveur."
       ),
       perms=dict(
-        role="TUTU"
+        role=("TUTU", )
       ),
     ),
     off=dict(
@@ -32,7 +32,7 @@ class RaidHandler(ticu.module.TiCuModule):
         "Desactiver le mode raid."
       ),
       perms=dict(
-        role="TUTU"
+        role=("TUTU", )
       ),
     ),
     status=dict(
@@ -93,7 +93,10 @@ class RaidHandler(ticu.module.TiCuModule):
   async def deactivate_invite_message(self, guild):
     try:
       for invite in await guild.invites():
+        await self.send_to_system_channel(guild, f"Suppression de l'invitation {invite.id}")
         await invite.delete()
+      else:
+        await self.send_to_system_channel(guild, "Aucune invitation active")
     except NotImplementedError:
       pass
       ## #The test framework did not implement invites mecanisms...
@@ -106,10 +109,10 @@ class RaidHandler(ticu.module.TiCuModule):
   async def reactivate_invites(self, guild):
     await self.send_to_system_channel(
       guild,
-      "\n".join(
+      "\n".join((
         "Le mode raid du bot a été désactivé.",
         "N'oubliez pas de recréer des invitations."
-      )
+      ))
     )
 
   async def delete_alerte_messages(self, guild):
@@ -158,8 +161,15 @@ class RaidHandler(ticu.module.TiCuModule):
       await self.deactivate_raid_mode()
 
   async def _command_on(self, message, command, args):
-    pass
+    await self.activate_raid_mode(message.channel.guild)
+    await self._command_status(message, "", ())
+
   async def _command_off(self, message, command, args):
-    pass
+    await self.deactivate_raid_mode(message.channel.guild)
+    await self._command_status(message, "", ())
+
   async def _command_status(self, message, command, args):
-    pass
+    await self.send_message(
+      message.channel,
+      f"{self.name} status: {'activé' if self.raid_mode else 'en veille'}"
+    )

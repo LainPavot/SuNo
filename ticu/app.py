@@ -41,6 +41,8 @@ class App(discord.Client):
     if message.author == self.user:
       return
     args = (message, *args)
+    if message.content == "!app load":
+      return await self.load_servers_roles(message)
     await self.map_modules("on_message", args, kwargs)
 
   async def on_member_join(self, *args, **kwargs):
@@ -64,6 +66,26 @@ class App(discord.Client):
           f"The module {module.name} did not dispatch correctly "
           f"for the function {func_name}. Expected bool, got {type(result)}."
         )
+
+  async def load_servers_roles(self, message):
+    roles = await message.channel.guild.fetch_roles()
+    i = 0
+    for role in roles:
+      if role.name not in self.config.ROLE_NAME_TO_CODE:
+        logger.warning(f"Unknown role: {role.name}")
+        continue
+      self.load_role(message.channel.guild, role)
+      i += 1
+    await self._modules[0].send_message(message.channel, f"Nombre de roles chargés: {i}")
+
+  def load_role(self, guild, role):
+      self.config.ROLES.setdefault(guild.id, {})[
+        self.config.ROLE_NAME_TO_CODE[role.name]
+      ] = role
+
+  def get_role(self, guild, role_code):
+    return self.config.ROLES.setdefault(guild.id, {}).get(role_code)
+
 
   def set_dev_mode(self, print_stdout=True):
     if not self.dev:
