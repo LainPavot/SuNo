@@ -23,8 +23,26 @@ start:
 dev:
 	@$(ACTIVATE) && ticu run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
 
-test:
-	@$(ACTIVATE) && pytest -v -s --show-capture=all $(flags)
+raw_test:
+	$(ACTIVATE) && pytest -v -s --show-capture=all
+
+test:$(addprefix do-,$(shell ls tests/test_*))
+
+./do-tests/test_%:
+	@for func in $(shell \
+		grep -Po "async def test_[a-zA-Z0-9_]+" tests/test_$* \
+		| cut -d ' ' -f 3 \
+	); do \
+		$(MAKE) ./test-function-tests/test_$* func=$${func} --no-print-directory ; \
+	done
+./test-function-tests/test_%:
+	@export x="$(shell \
+		$(ACTIVATE) \
+		&& pytest -q tests/test_$* -k $(func) 2> /dev/null \
+		| grep -Po 'passed|failed' \
+	)" && [ "$${x}" = "passed" ] && color="32" || color="31" \
+		&& echo "\033[$${color}m[$${x}]\033[m $(func)" \
+	;
 
 stop:
 	@if [ -f "$(PIDFILE)" ];then \
@@ -37,3 +55,5 @@ stop:
 kill:
 	@echo "Killing all instances of TiCu"
 	@-killall ticu
+
+.PHONY:tests/test_* test-function-*
