@@ -4,6 +4,8 @@
 SQLITE_PATH = "ticu.sqlite"
 SUSPICIOUS_JOIN_FREQUENCY = 1
 
+DEBUG_DATABASE = False
+
 
 TUTU = "TUTU"
 PHO = "PHO"
