@@ -6,7 +6,10 @@ from logging import handlers
 import contextlib
 import logging
 import os
+import re
 import sys
+
+import discord.errors
 
 
 class PIDManager(contextlib.ContextDecorator):
@@ -77,9 +80,17 @@ def get_logger(name, filename=None, debug=False, noprint=True):
   return logger
 
 def add_stdout_handler(logger):
-  formater = get_formater()
   stream_handler = logging.StreamHandler(sys.stdout)
-  stream_handler.setFormatter(formater)
+  stream_handler.setFormatter(get_formater())
   logger.addHandler(stream_handler)
 
-
+async def user_from_mention(client, mention, logger=None, guild=None):
+  if re.match(r"<@&\d{18}>", mention):
+    return None
+  match = re.search(r"\d{18}", mention)
+  user_id = match[0]
+  logger and logger.debug(f"Fetching user of ID {user_id}")
+  if guild:
+    return await guild.fetch_member(int(user_id))
+  else:
+    return await client.fetch_user(int(user_id))
