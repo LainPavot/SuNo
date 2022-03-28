@@ -92,6 +92,8 @@ class App(discord.Client):
       self.dev = True
       if print_stdout:
         ticu.utils.add_stdout_handler(logger)
+        ticu.utils.add_stdout_handler(ticu.database.database_logger)
+      ticu.database.database_logger.setLevel(logging.DEBUG)
       logger.setLevel(logging.DEBUG)
       logger.debug(f"Dev mode activated for client.")
       for module in self._modules:
