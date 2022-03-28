@@ -1,11 +1,28 @@
 
-import ticu.module
+import ticu.command
 import ticu.database
+import ticu.module
 
 
 class NewMembers(ticu.module.TiCuModule):
 
   name = "NewMembers"
+
+  command_prefix = "welcome"
+
+  test_command_info = dict(
+    to=dict(
+      args=(ticu.command.contains(ticu.command.args.mention), )
+    )
+  )
+
+  welcome_message = """
+  {user.mention}, bienvenu sur {guild.name}.
+  """
+
+  welcome_back_message = """
+  {user.mention}, bon retour sur {guild.name}.
+  """
 
   async def on_ready(self, *args, **kwargs):
     await super().on_ready(*args, **kwargs)
@@ -26,12 +43,17 @@ class NewMembers(ticu.module.TiCuModule):
       await self.ban_member(member)
       self.logger.info(f"Member {member.mention} has autoban flag: banned.")
       return True
+    else:
+      self.logger.debug(f"Member {member.mention} does not have the autoban flag ")
     if ticu.database.has_auto_kick(member):
       await self.kick_member(member)
       self.logger.info(f"Member {member.mention} has autokick flag: kicked.")
       return True
+    else:
+      self.logger.debug(f"Member {member.mention} does not have the autokick flag ")
     self.logger.info(f"Old member {member.mention} has re-joined the server.")
-    await self.send_welcome_message(member)
+    await self.send_welcome_message(member, back=True)
+    await self.reassign_roles(member)
     return False
 
   async def handle_member_first_coming(self, member):
@@ -40,10 +62,34 @@ class NewMembers(ticu.module.TiCuModule):
     await self.send_welcome_message(member)
     return False
 
-  async def send_welcome_message(self, member):
-    guild = member.guild
-    to_send = f"Welcome {member.mention} to {guild.name}!"
-    sent = await self.send_to_system_channel(member.guild, to_send)
-    if not sent:
-      await self.send_message(member.guild.channels[0], to_send)
+  async def send_welcome_message(self, member, guild=None, back=False):
+    if guild is None:
+      guild = member.guild
+    if back:
+      message = self.welcome_back_message
+    else:
+      message = self.welcome_message
+    to_send = message.format(user=member, guild=guild)
+    if not await self.send_to_system_channel(guild, to_send):
+      await self.send_message(guild.channels[0], to_send)
     return False
+
+  async def reassign_roles(self, member):
+    self.logger.warning(f"{self.name}-reassign_roles not implemented")
+
+  async def _command_to(self, message, command, args):
+    user = await ticu.utils.user_from_mention(
+      self._app,
+      args[0],
+      logger=self.logger,
+      # guild=message.channel.guild
+    )
+    if user is None:
+      return False
+    member = await message.channel.guild.fetch_member(user.id)
+    return await self.on_member_join(member)
+    return await self.send_welcome_message(
+      user,
+      guild=message.channel.guild
+    )
+
