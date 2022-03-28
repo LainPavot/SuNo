@@ -5,6 +5,7 @@ import inspect
 import logging
 import re
 
+import ticu.command
 import ticu.database
 import ticu.utils
 
@@ -21,6 +22,8 @@ class TiCuModule:
     help=dict()
   )
 
+  test_command_info = dict()
+
   def __hash__(self):
     return hash(f"TiCuModule-{self.name}")
 
@@ -35,6 +38,8 @@ class TiCuModule:
     self._app = app
     self.dev = False
     self.command_info.setdefault("help", dict(help="Obtenir l'aide de ce module"))
+    if self.config.TEST:
+      self.command_info.update(self.test_command_info)
     self.check_integrity()
 
   def check_integrity(self):
@@ -136,8 +141,34 @@ class TiCuModule:
         f"Commande inconnue: {command}"
       )
     self.logger_debug_function(f"Command matches {self.name}:{command}.")
-    await self.run_command_check_perm(message, command, tuple(args))
+    if args == ["help"]:
+      return await self._specific_mommand_help(message, command)
+    if not await self.check_command_syntax(message, command, tuple(args)):
+      return await self.send_message(
+        message.channel,
+        f"Mauvaise syntaxe pour {self.command_prefix} {command}. \"!{self.command_prefix} {command} help\" pour"
+        " afficher l'aide."
+      )
+    return await self.run_command_check_perm(message, command, tuple(args))
+
+  async def check_command_syntax(self, message, command, args):
+    cmd_info = self.command_info[command]
+    parsed_params = self.extract_command_meta_info(args)
+    for original_param, parameter in zip(args, parsed_params):
+      for param_checker in cmd_info.get("args", ()):
+        if param_checker(parameter):
+          self.logger.debug(f"param \"{original_param}\" ({parameter}) matched!")
+          break
+      else:
+        self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
+        return False
     return True
+
+  def extract_command_meta_info(self, args):
+    for arg in args:
+      if re.match(r"<@[!&]?\d{18}>", arg):
+        yield ticu.command.args.mention
+      yield ticu.command.args.string
 
   async def run_command_check_perm(self, message, command, args):
     if not self.check_perms(message.author, command):
@@ -155,6 +186,7 @@ class TiCuModule:
       )
     handler = getattr(self, f"_command_{command}")
     await handler(message, command, args)
+    return True
 
   def get_role(self, *args, **kwargs):
     return self._app.get_role(*args, **kwargs)
@@ -215,3 +247,9 @@ class TiCuModule:
       f"",
       f"{commands_help}",
     ))
+
+  async def _specific_mommand_help(self, message, command):
+    return await self.send_message(
+      message.channel,
+      self.command_info[command].get("help", self.module_help)
+    )
