@@ -91,6 +91,12 @@ class TiCuModule:
     self.logger_debug_function(f"New member just joined: {member.name}")
     return False
 
+  async def on_reaction_add(self, reaction, user):
+    return False
+
+  async def on_reaction_remove(self, reaction, user):
+    return False
+
   async def ban_member(self, member):
     ticu.database.ban_member(member)
     await member.guild.ban(member)
@@ -134,7 +140,8 @@ class TiCuModule:
       return True
     if not content.startswith(f"!{self.command_prefix} "):
       return False
-    module, command, *args = content.split(" ")
+    module, command, *args = ticu.command.split_args(content)
+    args = list(args)
     if command not in self.command_info:
       return await self.send_message(
         message.channel,
@@ -153,14 +160,28 @@ class TiCuModule:
 
   async def check_command_syntax(self, message, command, args):
     cmd_info = self.command_info[command]
-    parsed_params = self.extract_command_meta_info(args)
+    parsed_params = list(self.extract_command_meta_info(args))
+    if (getter := cmd_info.get("before_args")):
+      before_args = getter(locals())
+    else:
+      before_args = tuple()
     for original_param, parameter in zip(args, parsed_params):
-      for param_checker in cmd_info.get("args", ()):
-        if param_checker(parameter):
+      if "args" not in cmd_info:
+        continue
+      for param_checker in cmd_info["args"]:
+        if param_checker(*before_args, parameter):
           self.logger.debug(f"param \"{original_param}\" ({parameter}) matched!")
           break
-      else:
-        self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
+      self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
+      return False
+    for checker in cmd_info.get("all_args", tuple()):
+      result = checker(*before_args, args, parsed_params)
+      if not isinstance(result, bool):
+        if isinstance(result, str):
+          await self.send_message(message.channel, result)
+        result = False
+      if not result:
+        self.logger.debug(f"params \"{args}\" ({parsed_params}) not matched!")
         return False
     return True
 
@@ -175,14 +196,6 @@ class TiCuModule:
       return await self.send_message(
         message.channel,
         "Vous n'avez pas l'autorisation de lancer cette commande."
-      )
-    if (command_info := self.command_info.get(command, None)) is None:
-      return await self.send_message(
-        message.channel,
-        (
-          f"Cette commande n'existe pas."
-          f"Envoyez !{self.command_prefix} help pour obtenir de l'aide."
-        )
       )
     handler = getattr(self, f"_command_{command}")
     await handler(message, command, args)

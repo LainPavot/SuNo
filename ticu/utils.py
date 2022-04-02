@@ -94,3 +94,11 @@ async def user_from_mention(client, mention, logger=None, guild=None):
     return await guild.fetch_member(int(user_id))
   else:
     return await client.fetch_user(int(user_id))
+
+def extract_id(message, as_int=False):
+  if as_int:
+    try:
+      return int(extract_id(message)[0])
+    except:
+      return None
+  return re.search(r"\d{18}", message)

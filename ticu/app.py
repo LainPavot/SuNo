@@ -48,6 +48,12 @@ class App(discord.Client):
   async def on_member_join(self, *args, **kwargs):
     await self.map_modules("on_member_join", args, kwargs)
 
+  async def on_reaction_add(self, *args, **kwargs):
+    await self.map_modules("on_reaction_add", args, kwargs)
+
+  async def on_reaction_remove(self, *args, **kwargs):
+    await self.map_modules("on_reaction_remove", args, kwargs)
+
   async def map_modules(self, func_name, args=(), kwargs={}):
     """
     Take a function's name and parameter and call each module's function

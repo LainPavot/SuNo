@@ -10,12 +10,13 @@ import ticu.modules
 
 intents = discord.Intents.all()
 
-app = ticu.app.App()
+app = ticu.app.App(intents=intents)
 
 modules = [
   ticu.modules.RaidHandler,
   ticu.modules.ExampleModule,
   ticu.modules.NewMembers,
+  ticu.modules.ReactionMessage,
 ]
 
 for module in modules:
