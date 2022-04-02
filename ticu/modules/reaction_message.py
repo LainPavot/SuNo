@@ -1,10 +1,12 @@
 
+import discord
+
 import ticu.command
 import ticu.database
 import ticu.module
 
 
-def pair_of_reaction_role(message, args, parsed):
+def pair_of_reaction_role(message:discord.Message, args, parsed):
   args = args[1:]
   if not args:
     return False
@@ -49,7 +51,7 @@ class ReactionMessage(ticu.module.TiCuModule):
     super().__init__(*args, **kwargs)
     self.cache = {}
 
-  async def on_reaction_add(self, reaction, user):
+  async def on_reaction_add(self, reaction:discord.Reaction, user:discord.User):
     if user.bot:
       return False
     message = reaction.message
@@ -72,7 +74,7 @@ class ReactionMessage(ticu.module.TiCuModule):
     await reaction.remove(user)
     return True
 
-  async def assign_or_remove_role(self, member, role_name):
+  async def assign_or_remove_role(self, member:discord.Member, role_name:str):
     roles = await member.guild.fetch_roles()
     if not (filtered := [role for role in roles if role.name == role_name]):
       return False
