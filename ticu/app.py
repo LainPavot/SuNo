@@ -6,8 +6,10 @@ import os
 
 import discord
 
-import ticu.utils
 import ticu.config
+import ticu.database
+import ticu.sync
+import ticu.utils
 
 
 logger = ticu.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
@@ -19,6 +21,10 @@ class App(discord.Client):
     self._modules = []
     self.config = ticu.config
     self.dev = False
+    self.role_sync = ticu.sync.RoleSync()
+    for action in self.role_sync.syncable_role_action:
+      action = f"{self.role_sync.prefix}{action}"
+      setattr(self, action, getattr(self.role_sync, action))
     super().__init__(*args, **kwargs)
 
   def register(self, module):
@@ -38,12 +44,15 @@ class App(discord.Client):
     await self.map_modules("on_ready", args, kwargs)
 
   async def on_message(self, message, *args, **kwargs):
-    if message.author == self.user:
+    if message.author.bot:
       return
     args = (message, *args)
-    if message.content == "!app load":
-      return await self.load_servers_roles(message)
+    if message.content == self.config.LOAD_COMMAND:
+      return await self.load_everythin(message)
     await self.map_modules("on_message", args, kwargs)
+
+  async def on_guild_available(self, guild):
+    await self.load_everythin(None, guild)
 
   async def on_member_join(self, *args, **kwargs):
     await self.map_modules("on_member_join", args, kwargs)
@@ -73,25 +82,41 @@ class App(discord.Client):
           f"for the function {func_name}. Expected bool, got {type(result)}."
         )
 
-  async def load_servers_roles(self, message):
-    roles = await message.channel.guild.fetch_roles()
+  async def load_everythin(self, message, guild=None):
+    if guild is None:
+      guild = message.channel.guild
+    with ticu.database.Session() as session:
+      ticu.database.get_or_create(
+        session,
+        ticu.database.Server,
+        id=guild.id,
+        name=guild.name
+      )
+    await self.load_servers_roles(message, guild)
+
+  async def load_servers_roles(self, message, guild):
+    roles = await guild.fetch_roles()
     i = 0
     for role in roles:
-      if role.name not in self.config.ROLE_NAME_TO_CODE:
+      if role.name not in self.config.ROLE_NAME_TO_CODE.get(guild.id, {}):
         logger.warning(f"Unknown role: {role.name}")
         continue
-      self.load_role(message.channel.guild, role)
+      self.load_role(guild, role)
+      logger.info(f"Role {role.name} loaded from {guild.name}.")
       i += 1
-    await self._modules[0].send_message(message.channel, f"Nombre de roles chargés: {i}")
+    if message is not None:
+      await self._modules[0].send_message(
+        message.channel,
+        f"Nombre de roles chargés: {i}"
+      )
 
   def load_role(self, guild, role):
       self.config.ROLES.setdefault(guild.id, {})[
-        self.config.ROLE_NAME_TO_CODE[role.name]
+        self.config.ROLE_NAME_TO_CODE[guild.id][role.name]
       ] = role
 
   def get_role(self, guild, role_code):
     return self.config.ROLES.setdefault(guild.id, {}).get(role_code)
-
 
   def set_dev_mode(self, print_stdout=True):
     if not self.dev:

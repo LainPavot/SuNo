@@ -24,7 +24,7 @@ class RaidHandler(ticu.module.TiCuModule):
         " personnes qui rejoignent le serveur."
       ),
       perms=dict(
-        role=("TUTU", )
+        role=("ROLE_CONFIANCE_HAUTE", )
       ),
     ),
     off=dict(
@@ -32,7 +32,7 @@ class RaidHandler(ticu.module.TiCuModule):
         "Desactiver le mode raid."
       ),
       perms=dict(
-        role=("TUTU", )
+        role=("ROLE_CONFIANCE_HAUTE", )
       ),
     ),
     status=dict(
@@ -40,6 +40,10 @@ class RaidHandler(ticu.module.TiCuModule):
         "Obtenir les status du module anti-raid."
       ),
     ),
+  )
+
+  test_command_info = dict(
+    
   )
 
   def __init__(self, *args, **kwargs):
