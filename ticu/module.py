@@ -205,6 +205,9 @@ class TiCuModule:
   def get_role(self, *args, **kwargs):
     return self._app.get_role(*args, **kwargs)
 
+  async def manage_role(self, action:str, *args, **kwargs):
+    return await getattr(self._app, f"_sync_role_{action}")(*args, **kwargs)
+
   def check_perms(self, user, command):
     command_info = self.command_info[command]
     if not (roles := command_info.get("perms", {}).get("role")):

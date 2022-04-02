@@ -9,6 +9,7 @@ import os
 import re
 import sys
 
+import discord
 import discord.errors
 
 
@@ -98,7 +99,54 @@ async def user_from_mention(client, mention, logger=None, guild=None):
 def extract_id(message, as_int=False):
   if as_int:
     try:
-      return int(extract_id(message)[0])
+      return int(extract_id(message))
     except:
       return None
-  return re.search(r"\d{18}", message)
+  try:
+    return re.search(r"\d{18}", message)[0]
+  except:
+    return None
+
+def role_to_code(conf, guild:discord.Guild, role):
+  conf.ROLE_NAME_TO_CODE
+
+def code_to_role_name(conf, guild:discord.Guild, code):
+  conf.ROLE_CODE_TO_NAME
+
+def role_name_to_role(guild, role_name):
+  for role in guild.roles:
+    if role_name == role.name:
+      return role
+  return None
+
+def role_id_to_role(guild, role_id):
+  for role in guild.roles:
+    if role_name == role.id:
+      return role
+  return None
+
+def role_to_code_to_role(
+  conf,
+  input_guild:discord.Guild,
+  role:discord.Role,
+  output_guild:discord.Guild
+) -> [discord.Role|NoneType]:
+  if not (code := role_to_code(conf, input_guild, role)):
+    print(
+      f"Role {role.name}:{role.id} is not known by the bot."
+      " Please, add it to the conf file."
+    )
+    return None
+  if not (output_role_name := code_to_role_name(conf, output_guild, code)):
+    print(
+      f"Role {role.name}:{role.id} does not exists on the other guild."
+      f" Please, add the translation to {output_guild.name} conf file."
+    )
+    return None
+  if not (output_role := role_name_to_role(output_guild, output_role_name)):
+    print(
+      f"Role {role.name}:{role.id} does not exists on the other guild."
+      f" Please, create it in the guild {output_guild.name}."
+    )
+    return None
+  return output_role

@@ -79,8 +79,8 @@ class ReactionMessage(ticu.module.TiCuModule):
     role = filtered[0]
     for curent_role in member.roles:
       if curent_role == role:
-        return await member.remove_roles(role)
-    return await member.add_roles(role)
+        return await self.manage_role("remove", member, role)
+    return await self.manage_role("add", member, role)
 
   async def _command_gives_role(self, message, command, args):
     self_msg = await message.channel.send(args[0])
