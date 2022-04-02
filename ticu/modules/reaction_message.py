@@ -5,7 +5,6 @@ import ticu.module
 
 
 def pair_of_reaction_role(message, args, parsed):
-  print(args)
   args = args[1:]
   if not args:
     return False
@@ -13,8 +12,6 @@ def pair_of_reaction_role(message, args, parsed):
     return False
   for emote, role in zip(args[::2], args[1::2]):
     if not ticu.command.arg_is_role(message.channel.guild, role):
-      print(role)
-      print("not a role")
       print(message.channel.guild.roles)
       return f"'{role}' n'est pas un nom ni un identifiant de role reconnu."
   return True
@@ -101,7 +98,6 @@ class ReactionMessage(ticu.module.TiCuModule):
     self.add_message_to_watch(self_msg, args[1:])
 
   def add_message_to_watch(self, message, args):
-    print(args)
     self.cache[message.id] = {
       emote: role
       for emote, role in zip(args[::2], args[1::2])

@@ -37,6 +37,7 @@ class TiCuModule:
     )
     self._app = app
     self.dev = False
+    self.command_info = self.command_info.copy()
     self.command_info.setdefault("help", dict(help="Obtenir l'aide de ce module"))
     if self.config.TEST:
       self.command_info.update(self.test_command_info)
