@@ -26,10 +26,10 @@ def arg_is_role(*args):
 
 def arg_is_role_id(guild, arg):
   role_id = ticu.utils.extract_id(arg, as_int=True)
-  return any(arg == role.id for role in guild.roles)
+  return ticu.utils.role_id_to_role(guild, role_id) is not None
 
 def arg_is_role_name(guild, arg):
-  return any(arg == role.name for role in guild.roles)
+  return ticu.utils.role_name_to_role(guild, arg) is not None
 
 def arg_is_reaction_id(guild, arg):
   reaction_id = ticu.utils.extract_id(arg, as_int=True)

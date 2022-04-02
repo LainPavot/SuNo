@@ -9,6 +9,7 @@ import ticu.command
 import ticu.database
 import ticu.utils
 
+
 class TiCuModule:
 
   name = "TiCuModule"
@@ -103,7 +104,7 @@ class TiCuModule:
     await member.guild.ban(member)
     self.logger.debug(f"[discord] {member.mention} has been baned.")
 
-  async def ban_member(self, member):
+  async def kick_member(self, member):
     ticu.database.kick_member(member)
     await member.guild.kick(member)
     self.logger.debug(f"[discord] {member.mention} has been kicked.")
@@ -121,15 +122,6 @@ class TiCuModule:
     self.logger.debug(f"[discord] Sending message \"{to_send}\" in {channel.name}.")
     await channel.send(to_send)
     return True
-
-  async def send_reaction_message(
-    self,
-    content,
-    guild,
-    ping=None,
-    callback=None
-  ):
-    pass
 
   def logger_debug_function(self, message):
     self.logger.debug(f"[{inspect.stack()[1][3]}] - {message}")
@@ -239,6 +231,7 @@ class TiCuModule:
   def _build_all_modules_md_help(self):
     return "\n".join((
       "```markdown",
+      f"{self.config.LOAD_COMMAND}: load the server.",
       "\n".join(
         module._build_module_raw_help()
         for module in self._app._modules
