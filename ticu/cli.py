@@ -17,6 +17,7 @@ modules = [
   ticu.modules.ExampleModule,
   ticu.modules.NewMembers,
   ticu.modules.ReactionMessage,
+  ticu.modules.DebugModule,
 ]
 
 for module in modules:
