@@ -71,8 +71,24 @@ class NewMembers(ticu.module.TiCuModule):
       message = self.welcome_message
     to_send = message.format(user=member, guild=guild)
     if not await self.send_to_system_channel(guild, to_send):
-      await self.send_message(guild.channels[0], to_send)
+      if (channel := self._find_appropriate_random_channel(guild)):
+        return await self.send_message(channel, to_send)
     return False
+
+  def _find_appropriate_random_channel(self, guild):
+    channels = [
+      channel
+      for channel in guild.channels
+      if not isinstance(channel, discord.CategoryChannel)
+    ]
+    for is_fine_channel in (
+      lambda channel:channel.name.lower() == "général",
+      lambda channel:"général" in channel.name.lower(),
+    ):
+      for channel in channels:
+        if is_fine_channel(channel):
+          return channel
+    return None
 
   async def reassign_roles(self, member):
     self.logger.warning(f"{self.name}-reassign_roles not implemented")
