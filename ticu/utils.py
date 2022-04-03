@@ -8,6 +8,7 @@ import logging
 import os
 import re
 import sys
+import typing
 
 import discord
 import discord.errors
@@ -130,7 +131,7 @@ def role_to_code_to_role(
   input_guild:discord.Guild,
   role:discord.Role,
   output_guild:discord.Guild
-) -> [discord.Role|NoneType]:
+) -> typing.Optional[discord.Role]:
   if not (code := role_to_code(conf, input_guild, role)):
     print(
       f"Role {role.name}:{role.id} is not known by the bot."

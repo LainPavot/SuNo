@@ -3,3 +3,5 @@
 /.token
 *.log
 /.pytest_cache/
+/ticu.sublime-project
+/ticu.sublime-workspace
