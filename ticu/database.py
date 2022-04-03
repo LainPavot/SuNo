@@ -17,7 +17,7 @@ class Server(Base):
 
   id = sa.Column(sa.Integer, primary_key=True)
   name = sa.Column(sa.String(64))
-  members = sao.relationship("Member", secondary="server_member", back_populates=False)
+  members = sao.relationship("Member", secondary="server_member")
 
   def __repr__(self):
     return f"<Server(name='{self.name}')>"
@@ -37,7 +37,7 @@ class Role(Base):
   id = sa.Column(sa.Integer, primary_key=True)
   discord_id = sa.Column(sa.Integer)
   name = sa.Column(sa.String(64))
-  members = sao.relationship("Member", secondary="member_role", back_populates=False)
+  members = sao.relationship("Member", secondary="member_role")
 
   def __repr__(self):
     return f"<Role(pseudo='{self.pseudo}')>"
@@ -51,8 +51,8 @@ class Member(Base):
   banned = sa.Column(sa.Boolean, default=False)
   kicked = sa.Column(sa.Boolean, default=False)
   notification = sa.Column(sa.Boolean)
-  servers = sao.relationship("Server", secondary="server_member")
-  roles = sao.relationship("Role", secondary="member_role")
+  servers = sao.relationship("Server", secondary="server_member", overlaps="members")
+  roles = sao.relationship("Role", secondary="member_role", overlaps="members")
 
   def __repr__(self):
     return f"<Member(id='{self.id}')>"
