@@ -1,4 +1,7 @@
 
+
+import discord
+
 import ticu.command
 import ticu.database
 import ticu.module
@@ -79,10 +82,10 @@ class NewMembers(ticu.module.TiCuModule):
     channels = [
       channel
       for channel in guild.channels
-      if not isinstance(channel, discord.CategoryChannel)
+      if not isinstance(channel, (discord.CategoryChannel, discord.VoiceChannel))
     ]
     for is_fine_channel in (
-      lambda channel:channel.name.lower() == "général",
+      lambda channel:channel.name.lower() in ("général", "general"),
       lambda channel:"général" in channel.name.lower(),
     ):
       for channel in channels:
