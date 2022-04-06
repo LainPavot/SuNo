@@ -1,15 +1,15 @@
 
 
 
-SQLITE_PATH = "ticu.sqlite"
-SUSPICIOUS_JOIN_FREQUENCY = 1
+SQLITE_PATH:str = "ticu.sqlite"
+SUSPICIOUS_JOIN_FREQUENCY:float = 1
 
-DEBUG_DATABASE = False
+DEBUG_DATABASE:bool = False
 
-LOAD_COMMAND = "!app load"
+LOAD_COMMAND:str = "!app load"
 
 
-TEST = True
+TEST:bool = True
 
 if TEST:
   from ticu.test_config import *
@@ -18,12 +18,12 @@ else:
   from ticu.prod_config import *
 
 
-ROLE_CODE_TO_NAME = {
+ROLE_CODE_TO_NAME:dict = {
   server: {
     value: key
     for key, value in ROLE_NAME_TO_CODE[server].items()
   } for server in ROLE_NAME_TO_CODE
 }
 
-ROLES = {}
+ROLES:dict = {}
 

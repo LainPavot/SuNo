@@ -12,18 +12,18 @@ import ticu.utils
 
 class TiCuModule:
 
-  name = "TiCuModule"
-  command_prefix = name
-  module_help = (
+  name:str = "TiCuModule"
+  command_prefix:str = name
+  module_help:str = (
     "L'aide de ce module n'a pas été rédigée, n'hésitez pas"
     "à contacter Lainou#2122 ou tout autre personne du dev' pour la rédiger, "
     "ou pour vous l'expliquer."
   )
-  command_info = dict(
+  command_info:dict = dict(
     help=dict()
   )
 
-  test_command_info = dict()
+  test_command_info:dict = dict()
 
   def __hash__(self):
     return hash(f"TiCuModule-{self.name}")
@@ -31,14 +31,14 @@ class TiCuModule:
   def __init__(self, app, logger_name=None):
     if logger_name is None:
       logger_name = self.name
-    self.logger = ticu.utils.get_logger(
+    self.logger:logging.Logger = ticu.utils.get_logger(
       logger_name,
       filename=f"logs/{logger_name}.log",
       noprint=True
     )
-    self._app = app
-    self.dev = False
-    self.command_info = self.command_info.copy()
+    self._app:discord.Client = app
+    self.dev:bool = False
+    self.command_info:dict = self.command_info.copy()
     self.command_info.setdefault("help", dict(help="Obtenir l'aide de ce module"))
     if self.config.TEST:
       self.command_info.update(self.test_command_info)
@@ -236,8 +236,9 @@ class TiCuModule:
       "```markdown",
       f"{self.config.LOAD_COMMAND}: load the server.",
       "\n".join(
-        module._build_module_raw_help()
+        f"!{module.command_prefix} help"
         for module in self._app._modules
+        if module.name != "ExampleModule"
       ),
       "```",
     ))

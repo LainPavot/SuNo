@@ -1,23 +1,23 @@
 
 
-MAIN_SERVER = 915547901378322443
-PLATIPUS_SERVER = 959888328927375430
-SERVERS = (
+MAIN_SERVER:int = 915547901378322443
+PLATIPUS_SERVER:int = 959888328927375430
+SERVERS:tuple = (
   MAIN_SERVER,
   PLATIPUS_SERVER,
 )
 
-OVERWRITES_ROLES = True
+OVERWRITES_ROLES:bool = True
 
 
 
 ### Those are just constantes to use in the code.
 ### Their value should not be important.
-ROLE_CONFIANCE_HAUTE = "1"
-ROLE_CONFIANCE_MOYENNE = "2"
-ROLE_CONFIANCE_BASSE = "3"
+ROLE_CONFIANCE_HAUTE:str = "1"
+ROLE_CONFIANCE_MOYENNE:str = "2"
+ROLE_CONFIANCE_BASSE:str = "3"
 
-ROLE_NAME_TO_CODE = {
+ROLE_NAME_TO_CODE:dict = {
   ### roles names for __this specific__ server
   MAIN_SERVER: {
     "role_confiance_haute": ROLE_CONFIANCE_HAUTE,
