@@ -6,24 +6,24 @@ import os
 
 import discord
 
-import ticu.config
-import ticu.database
-import ticu.sync
-import ticu.utils
+import suno.config
+import suno.database
+import suno.sync
+import suno.utils
 
 
-logger = ticu.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
+logger = suno.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
 
 
 class App(discord.Client):
 
   def __init__(self, *args, **kwargs):
     self._modules = []
-    self.config = ticu.config
+    self.config = suno.config
     self.dev = False
-    self.sync_manager = ticu.sync.SyncManager
+    self.sync_manager = suno.sync.SyncManager
     self.sync_manager.conf = self.config
-    self.role_sync = ticu.sync.RoleSync()
+    self.role_sync = suno.sync.RoleSync()
     for action in self.role_sync.syncable_role_action:
       action = f"{self.role_sync.prefix}{action}"
       setattr(self, action, getattr(self.role_sync, action))
@@ -88,8 +88,8 @@ class App(discord.Client):
     if guild is None:
       guild = message.channel.guild
     self.sync_manager.servers.add(guild)
-    with ticu.database.Session() as session:
-      ticu.database.create_server(guild)
+    with suno.database.Session() as session:
+      suno.database.create_server(guild)
     await self.load_servers_roles(message, guild)
 
   async def load_servers_roles(self, message, guild):
@@ -112,7 +112,7 @@ class App(discord.Client):
       self.config.ROLES.setdefault(guild.id, {})[
         self.config.ROLE_NAME_TO_CODE[guild.id][role.name]
       ] = role
-      ticu.database.create_role(role, guild)
+      suno.database.create_role(role, guild)
 
   def get_role(self, guild, role_code):
     return self.config.ROLES.setdefault(guild.id, {}).get(role_code)
@@ -121,9 +121,9 @@ class App(discord.Client):
     if not self.dev:
       self.dev = True
       if print_stdout:
-        ticu.utils.add_stdout_handler(logger)
-        ticu.utils.add_stdout_handler(ticu.database.database_logger)
-      ticu.database.database_logger.setLevel(logging.DEBUG)
+        suno.utils.add_stdout_handler(logger)
+        suno.utils.add_stdout_handler(suno.database.database_logger)
+      suno.database.database_logger.setLevel(logging.DEBUG)
       logger.setLevel(logging.DEBUG)
       logger.debug(f"Dev mode activated for client.")
       for module in self._modules:

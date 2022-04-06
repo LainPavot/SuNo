@@ -1,9 +1,9 @@
 
 import discord
 
-import ticu.command
-import ticu.database
-import ticu.module
+import suno.command
+import suno.database
+import suno.module
 
 
 def pair_of_reaction_role(message:discord.Message, args, parsed):
@@ -13,13 +13,13 @@ def pair_of_reaction_role(message:discord.Message, args, parsed):
   if len(args) % 2 != 0:
     return False
   for emote, role in zip(args[::2], args[1::2]):
-    if not ticu.command.arg_is_role(message.channel.guild, role):
+    if not suno.command.arg_is_role(message.channel.guild, role):
       print(message.channel.guild.roles)
       return f"'{role}' n'est pas un nom ni un identifiant de role reconnu."
   return True
 
 
-class ReactionMessage(ticu.module.TiCuModule):
+class ReactionMessage(suno.module.TiCuModule):
 
   name = "ReactionMessage"
 

@@ -1,10 +1,10 @@
 
-import ticu.command
-import ticu.database
-import ticu.module
+import suno.command
+import suno.database
+import suno.module
 
 
-class DebugModule(ticu.module.TiCuModule):
+class DebugModule(suno.module.TiCuModule):
 
   name = "DebugModule"
 
@@ -17,12 +17,12 @@ class DebugModule(ticu.module.TiCuModule):
 
   test_command_info = dict(
     db=dict(args=tuple()),
-    user=dict(args=ticu.command.args.mention)
+    user=dict(args=suno.command.args.mention)
   )
 
   async def _command_db(self, message, command, args):
-    with ticu.database.Session() as session:
-      servers = session.query(ticu.database.Server).all()
+    with suno.database.Session() as session:
+      servers = session.query(suno.database.Server).all()
       server_list_info = "\n".join(
         self._compile_info(obj, main_attr="name", attributes={"id":"id"})
         for obj in servers
@@ -58,8 +58,8 @@ class DebugModule(ticu.module.TiCuModule):
       )
 
   def _produce_server_info(self, message, server):
-    # with ticu.database.Session() as session:
-    #   server = session.query(ticu.database.Server).filter_by(id=server.id)
+    # with suno.database.Session() as session:
+    #   server = session.query(suno.database.Server).filter_by(id=server.id)
     members = server.members
     member_list_info = "\n".join(
       self._compile_info(

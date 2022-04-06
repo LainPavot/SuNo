@@ -2,7 +2,7 @@
 
 import collections
 
-import ticu.utils
+import suno.utils
 
 
 _command_args = ("string", "mention", "role_id", "role_name", "reaction")
@@ -25,14 +25,14 @@ def arg_is_role(*args):
   return arg_is_role_id(*args) or arg_is_role_name(*args)
 
 def arg_is_role_id(guild, arg):
-  role_id = ticu.utils.extract_id(arg, as_int=True)
-  return ticu.utils.role_id_to_role(guild, role_id) is not None
+  role_id = suno.utils.extract_id(arg, as_int=True)
+  return suno.utils.role_id_to_role(guild, role_id) is not None
 
 def arg_is_role_name(guild, arg):
-  return ticu.utils.role_name_to_role(guild, arg) is not None
+  return suno.utils.role_name_to_role(guild, arg) is not None
 
 def arg_is_reaction_id(guild, arg):
-  reaction_id = ticu.utils.extract_id(arg, as_int=True)
+  reaction_id = suno.utils.extract_id(arg, as_int=True)
   return any(reaction_id == emoji.id for emoji in guild.emojis)
 
 def split_args(content):

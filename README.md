@@ -3,7 +3,7 @@ TiCu - V2
 =========
 
 The python version of the TiCu bot. The bot itself is contained in the
-[ticu](tidu) directory.
+[suno](tidu) directory.
 
 The [setup.py](setup.py) file serves the purpose of describing the packagem it's associated
 python version and other metadata.
@@ -33,8 +33,8 @@ not** be.
 The bot will write its pid in the file defined in in the makefile (search for
 the PIDFILE constantm default if [.pid](.pid)).
 
-Logs are stored in the "ticu.{{subpart}}.log" file. For example, the main
-app's logs are stored in [ticu.app.log](ticu.app.log) .
+Logs are stored in the "suno.{{subpart}}.log" file. For example, the main
+app's logs are stored in [suno.app.log](suno.app.log) .
 
 stop
 ----

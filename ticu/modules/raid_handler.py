@@ -4,9 +4,9 @@
 import asyncio
 import time
 
-import ticu.module
+import suno.module
 
-class RaidHandler(ticu.module.TiCuModule):
+class RaidHandler(suno.module.TiCuModule):
 
   name = "RaidHandler"
   command_prefix = "raid"

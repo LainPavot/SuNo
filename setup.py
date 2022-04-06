@@ -2,7 +2,7 @@
 
 import os
 
-from ticu import __version__
+from suno import __version__
 from setuptools import setup, find_packages
 
 current_dir = os.path.dirname(__file__)
@@ -12,7 +12,7 @@ with open(os.path.join(current_dir, "requirements.txt")) as f:
   requirements = f.read().splitlines()
 
 setup(
-  name=u"ticu",
+  name=u"suno",
   version=__version__,
   description="The discord bot for the Tipoui community",
   long_description=LONG_DESC,
@@ -31,11 +31,11 @@ setup(
     "Programming Language :: Python :: 3",
   ],
   packages=find_packages(),
-  package_dir={"ticu": "ticu"},
+  package_dir={"suno": "suno"},
   include_package_data=True,
   entry_points={
     "console_scripts": [
-      "ticu = ticu.cli:cli"
+      "suno = suno.cli:cli"
     ]
   }
 )

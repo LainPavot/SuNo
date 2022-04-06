@@ -18,10 +18,10 @@ $(VENV_DIR):
 	@python3 -m virtualenv $(VENV_DIR)
 
 start:
-	@$(ACTIVATE) && ticu run --token=$$(cat .token) --pidfile=$(PIDFILE) &
+	@$(ACTIVATE) && suno run --token=$$(cat .token) --pidfile=$(PIDFILE) &
 
 dev:
-	@$(ACTIVATE) && ticu run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
+	@$(ACTIVATE) && suno run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
 
 raw_test:
 	$(ACTIVATE) && pytest -v -s --show-capture=all
@@ -54,6 +54,6 @@ stop:
 
 kill:
 	@echo "Killing all instances of TiCu"
-	@-killall ticu
+	@-killall suno
 
 .PHONY:tests/test_* test-function-*

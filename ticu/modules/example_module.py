@@ -1,7 +1,7 @@
 
 
-import ticu.module
+import suno.module
 
-class ExampleModule(ticu.module.TiCuModule):
+class ExampleModule(suno.module.TiCuModule):
 
   name = "ExampleModule"

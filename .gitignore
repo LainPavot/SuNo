@@ -1,8 +1,8 @@
 /.venv/
-/ticu.egg-info/
+/suno.egg-info/
 /.token
 *.log
 /.pytest_cache/
-/ticu.sublime-project
-/ticu.sublime-workspace
-/ticu.sqlite
+/suno.sublime-project
+/suno.sublime-workspace
+/suno.sqlite

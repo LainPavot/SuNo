@@ -1,7 +1,7 @@
 
 
 
-SQLITE_PATH:str = "ticu.sqlite"
+SQLITE_PATH:str = "suno.sqlite"
 SUSPICIOUS_JOIN_FREQUENCY:float = 1
 
 DEBUG_DATABASE:bool = False
@@ -12,10 +12,10 @@ LOAD_COMMAND:str = "!app load"
 TEST:bool = True
 
 if TEST:
-  from ticu.test_config import *
+  from suno.test_config import *
 
 else:
-  from ticu.prod_config import *
+  from suno.prod_config import *
 
 
 ROLE_CODE_TO_NAME:dict = {

@@ -3,21 +3,21 @@
 import click
 import discord
 
-import ticu.app
-import ticu.utils
-import ticu.modules
+import suno.app
+import suno.utils
+import suno.modules
 
 
 intents = discord.Intents.all()
 
-app = ticu.app.App(intents=intents)
+app = suno.app.App(intents=intents)
 
 modules = [
-  ticu.modules.RaidHandler,
-  ticu.modules.ExampleModule,
-  ticu.modules.NewMembers,
-  ticu.modules.ReactionMessage,
-  ticu.modules.DebugModule,
+  suno.modules.RaidHandler,
+  suno.modules.ExampleModule,
+  suno.modules.NewMembers,
+  suno.modules.ReactionMessage,
+  suno.modules.DebugModule,
 ]
 
 for module in modules:
@@ -42,5 +42,5 @@ def run(token, pidfile, dev=False):
   if dev:
     app.run(dev=dev)
   else:
-    with ticu.utils.PIDManager(pidfile, on_exists_callback=already_running):
+    with suno.utils.PIDManager(pidfile, on_exists_callback=already_running):
       app.run(dev=dev)

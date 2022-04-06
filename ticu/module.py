@@ -5,9 +5,9 @@ import inspect
 import logging
 import re
 
-import ticu.command
-import ticu.database
-import ticu.utils
+import suno.command
+import suno.database
+import suno.utils
 
 
 class TiCuModule:
@@ -31,7 +31,7 @@ class TiCuModule:
   def __init__(self, app, logger_name=None):
     if logger_name is None:
       logger_name = self.name
-    self.logger:logging.Logger = ticu.utils.get_logger(
+    self.logger:logging.Logger = suno.utils.get_logger(
       logger_name,
       filename=f"logs/{logger_name}.log",
       noprint=True
@@ -61,7 +61,7 @@ class TiCuModule:
     raise ValueError(f"Some integrity checks failed.\n{message}")
 
   def early_failure(self):
-    ticu.utils.add_stdout_handler(self.logger)
+    suno.utils.add_stdout_handler(self.logger)
     self.logger.setLevel(logging.DEBUG)
     self.logger.debug("Early failure: logger outputs on stdout.")
 
@@ -77,7 +77,7 @@ class TiCuModule:
     if not self.dev:
       self.dev = True
       if print_stdout:
-        ticu.utils.add_stdout_handler(self.logger)
+        suno.utils.add_stdout_handler(self.logger)
       self.logger.setLevel(logging.DEBUG)
       self.logger.debug(f"Dev mode activated for module {self.name}.")
 
@@ -100,12 +100,12 @@ class TiCuModule:
     return False
 
   async def ban_member(self, member):
-    ticu.database.ban_member(member)
+    suno.database.ban_member(member)
     await member.guild.ban(member)
     self.logger.debug(f"[discord] {member.mention} has been baned.")
 
   async def kick_member(self, member):
-    ticu.database.kick_member(member)
+    suno.database.kick_member(member)
     await member.guild.kick(member)
     self.logger.debug(f"[discord] {member.mention} has been kicked.")
 
@@ -133,7 +133,7 @@ class TiCuModule:
       return True
     if not content.startswith(f"!{self.command_prefix} "):
       return False
-    module, command, *args = ticu.command.split_args(content)
+    module, command, *args = suno.command.split_args(content)
     args = list(args)
     if command not in self.command_info:
       return await self.send_message(
@@ -184,8 +184,8 @@ class TiCuModule:
   def extract_command_meta_info(self, args):
     for arg in args:
       if re.match(r"<@[!&]?\d{18}>", arg):
-        yield ticu.command.args.mention
-      yield ticu.command.args.string
+        yield suno.command.args.mention
+      yield suno.command.args.string
 
   async def run_command_check_perm(self, message, command, args):
     if not self.check_perms(message.author, command):

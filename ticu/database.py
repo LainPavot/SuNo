@@ -3,8 +3,8 @@ import discord
 import sqlalchemy as sa
 import sqlalchemy.orm as sao
 
-import ticu.config
-import ticu.utils
+import suno.config
+import suno.utils
 
 
 Base:type = sao.declarative_base()
@@ -254,15 +254,15 @@ def create_role(
 
 
 
-database_logger = ticu.utils.get_logger(
+database_logger = suno.utils.get_logger(
   __name__,
   filename=f"logs/database.log",
   noprint=True
 )
 
 app = sa.create_engine(
-  f"sqlite:///{ticu.config.SQLITE_PATH}",
-  echo=ticu.config.DEBUG_DATABASE
+  f"sqlite:///{suno.config.SQLITE_PATH}",
+  echo=suno.config.DEBUG_DATABASE
 )
 
 Session = sao.sessionmaker(bind=app)

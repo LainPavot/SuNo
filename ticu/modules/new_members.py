@@ -2,12 +2,12 @@
 
 import discord
 
-import ticu.command
-import ticu.database
-import ticu.module
+import suno.command
+import suno.database
+import suno.module
 
 
-class NewMembers(ticu.module.TiCuModule):
+class NewMembers(suno.module.TiCuModule):
 
   name = "NewMembers"
 
@@ -15,7 +15,7 @@ class NewMembers(ticu.module.TiCuModule):
 
   test_command_info = dict(
     to=dict(
-      args=(ticu.command.contains(ticu.command.args.mention), )
+      args=(suno.command.contains(suno.command.args.mention), )
     )
   )
 
@@ -29,11 +29,11 @@ class NewMembers(ticu.module.TiCuModule):
 
   async def on_ready(self, *args, **kwargs):
     await super().on_ready(*args, **kwargs)
-    print(ticu.database.Session())
+    print(suno.database.Session())
     return False
 
   async def on_member_join(self, member):
-    if ticu.database.has_member(member):
+    if suno.database.has_member(member):
       handler = self.handle_member_coming_back
     else:
       handler = self.handle_member_first_coming
@@ -42,13 +42,13 @@ class NewMembers(ticu.module.TiCuModule):
     return no_process
 
   async def handle_member_coming_back(self, member):
-    if ticu.database.has_auto_ban(member):
+    if suno.database.has_auto_ban(member):
       await self.ban_member(member)
       self.logger.info(f"Member {member.mention} has autoban flag: banned.")
       return True
     else:
       self.logger.debug(f"Member {member.mention} does not have the autoban flag ")
-    if ticu.database.has_auto_kick(member):
+    if suno.database.has_auto_kick(member):
       await self.kick_member(member)
       self.logger.info(f"Member {member.mention} has autokick flag: kicked.")
       return True
@@ -61,7 +61,7 @@ class NewMembers(ticu.module.TiCuModule):
 
   async def handle_member_first_coming(self, member):
     self.logger.info(f"New member {member.mention} has joined the server.")
-    ticu.database.create_member(member)
+    suno.database.create_member(member)
     await self.send_welcome_message(member)
     return False
 
@@ -97,7 +97,7 @@ class NewMembers(ticu.module.TiCuModule):
     self.logger.warning(f"{self.name}-reassign_roles not implemented")
 
   async def _command_to(self, message, command, args):
-    user = await ticu.utils.user_from_mention(
+    user = await suno.utils.user_from_mention(
       self._app,
       args[0],
       logger=self.logger,

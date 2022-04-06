@@ -2,7 +2,7 @@
 
 import discord
 
-import ticu.database
+import suno.database
 
 
 class SyncManager:
@@ -25,7 +25,7 @@ class RoleSync:
 
   async def _remove_role(self, member, role):
     await member.remove_roles(role)
-    ticu.database.remove_role(member, role)
+    suno.database.remove_role(member, role)
 
   async def _sync_role_add(
     self,
@@ -37,7 +37,7 @@ class RoleSync:
 
   async def _add_role(self, member, role):
     await member.add_roles(role)
-    ticu.database.assign_role(member, role)
+    suno.database.assign_role(member, role)
 
   async def do_sync(self, callback, member, role):
     await callback(member, role)
@@ -47,7 +47,7 @@ class RoleSync:
         continue
       try:
         server_member = await server.fetch_member(member.id)
-        server_role = ticu.utils.role_to_code_to_role(
+        server_role = suno.utils.role_to_code_to_role(
           SyncManager.conf, member.guild, role, server
         )
       except Exception as e:
