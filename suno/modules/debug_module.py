@@ -20,6 +20,9 @@ class DebugModule(suno.module.SuNoModule):
     user=dict(args=suno.command.args.mention)
   )
 
+  async def _command_user(self, message, command, args):
+    return True
+
   async def _command_db(self, message, command, args):
     with suno.database.Session() as session:
       servers = session.query(suno.database.Server).all()
