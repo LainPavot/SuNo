@@ -6,7 +6,7 @@ import time
 
 import suno.module
 
-class RaidHandler(suno.module.TiCuModule):
+class RaidHandler(suno.module.SuNoModule):
 
   name = "RaidHandler"
   command_prefix = "raid"

@@ -19,7 +19,7 @@ def pair_of_reaction_role(message:discord.Message, args, parsed):
   return True
 
 
-class ReactionMessage(suno.module.TiCuModule):
+class ReactionMessage(suno.module.SuNoModule):
 
   name = "ReactionMessage"
 

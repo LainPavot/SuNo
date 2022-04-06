@@ -2,6 +2,6 @@
 
 import suno.module
 
-class ExampleModule(suno.module.TiCuModule):
+class ExampleModule(suno.module.SuNoModule):
 
   name = "ExampleModule"

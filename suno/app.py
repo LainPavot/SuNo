@@ -31,14 +31,14 @@ class App(discord.Client):
 
   def register(self, module):
     """
-    Registers a TiCu Module
-    Module must inherit from TiCuModule
+    Registers a SuNo Module
+    Module must inherit from SuNoModule
     """
     if module not in self._modules:
       self._modules.append(module)
 
   def stop(self):
-    logger.info("TiCu is shutting down.")
+    logger.info("SuNo is shutting down.")
 
   async def on_ready(self, *args, **kwargs):
     logger.info(f"Logged in as {self.user.name} - {self.user.id}")

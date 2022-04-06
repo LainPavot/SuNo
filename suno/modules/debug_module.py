@@ -4,7 +4,7 @@ import suno.database
 import suno.module
 
 
-class DebugModule(suno.module.TiCuModule):
+class DebugModule(suno.module.SuNoModule):
 
   name = "DebugModule"
 

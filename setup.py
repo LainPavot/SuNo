@@ -25,7 +25,7 @@ setup(
   classifiers=[
     "Development Status :: 2.0.0",
     "Intended Audience :: Tipoui Community",
-    "Natural Language :: Franch",
+    "Natural Language :: French",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",

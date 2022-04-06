@@ -10,9 +10,9 @@ import suno.database
 import suno.utils
 
 
-class TiCuModule:
+class SuNoModule:
 
-  name:str = "TiCuModule"
+  name:str = "SuNoModule"
   command_prefix:str = name
   module_help:str = (
     "L'aide de ce module n'a pas été rédigée, n'hésitez pas"
@@ -26,7 +26,7 @@ class TiCuModule:
   test_command_info:dict = dict()
 
   def __hash__(self):
-    return hash(f"TiCuModule-{self.name}")
+    return hash(f"SuNoModule-{self.name}")
 
   def __init__(self, app, logger_name=None):
     if logger_name is None:

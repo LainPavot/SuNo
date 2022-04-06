@@ -7,7 +7,7 @@ import suno.database
 import suno.module
 
 
-class NewMembers(suno.module.TiCuModule):
+class NewMembers(suno.module.SuNoModule):
 
   name = "NewMembers"
 
