@@ -61,7 +61,7 @@ def split_args_unsafe(content):
     if content[i] in (" ", "\n"):
       yield strip_val(content[begin:i])
       begin = i+1
-  yield content[begin:]
+  yield strip_val(content[begin:])
 
 __all__ = [
   "args",
