@@ -161,12 +161,15 @@ class TiCuModule:
     for original_param, parameter in zip(args, parsed_params):
       if "args" not in cmd_info:
         continue
+      matched = False
       for param_checker in cmd_info["args"]:
         if param_checker(*before_args, parameter):
           self.logger.debug(f"param \"{original_param}\" ({parameter}) matched!")
+          matched = True
           break
-      self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
-      return False
+      if not matched:
+        self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
+        return False
     for checker in cmd_info.get("all_args", tuple()):
       result = checker(*before_args, args, parsed_params)
       if not isinstance(result, bool):

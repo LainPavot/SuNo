@@ -21,6 +21,8 @@ class App(discord.Client):
     self._modules = []
     self.config = ticu.config
     self.dev = False
+    self.sync_manager = ticu.sync.SyncManager
+    self.sync_manager.conf = self.config
     self.role_sync = ticu.sync.RoleSync()
     for action in self.role_sync.syncable_role_action:
       action = f"{self.role_sync.prefix}{action}"
@@ -85,13 +87,9 @@ class App(discord.Client):
   async def load_everythin(self, message, guild=None):
     if guild is None:
       guild = message.channel.guild
+    self.sync_manager.servers.add(guild)
     with ticu.database.Session() as session:
-      ticu.database.get_or_create(
-        session,
-        ticu.database.Server,
-        id=guild.id,
-        name=guild.name
-      )
+      ticu.database.create_server(guild)
     await self.load_servers_roles(message, guild)
 
   async def load_servers_roles(self, message, guild):
@@ -114,6 +112,7 @@ class App(discord.Client):
       self.config.ROLES.setdefault(guild.id, {})[
         self.config.ROLE_NAME_TO_CODE[guild.id][role.name]
       ] = role
+      ticu.database.create_role(role, guild)
 
   def get_role(self, guild, role_code):
     return self.config.ROLES.setdefault(guild.id, {}).get(role_code)

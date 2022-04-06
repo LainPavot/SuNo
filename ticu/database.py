@@ -1,7 +1,4 @@
 
-
-
-
 import discord
 import sqlalchemy as sa
 import sqlalchemy.orm as sao
@@ -10,7 +7,8 @@ import ticu.config
 import ticu.utils
 
 
-Base = sao.declarative_base()
+Base:type = sao.declarative_base()
+
 
 class Server(Base):
   __tablename__ = "server"
@@ -18,6 +16,7 @@ class Server(Base):
   id = sa.Column(sa.Integer, primary_key=True)
   name = sa.Column(sa.String(64))
   members = sao.relationship("Member", secondary="server_member")
+  roles = sao.relationship("Role")
 
   def __repr__(self):
     return f"<Server(name='{self.name}')>"
@@ -35,9 +34,10 @@ class Role(Base):
   __tablename__ = "role"
 
   id = sa.Column(sa.Integer, primary_key=True)
-  discord_id = sa.Column(sa.Integer)
   name = sa.Column(sa.String(64))
   members = sao.relationship("Member", secondary="member_role")
+  server_id = sa.Column(sa.Integer, sa.ForeignKey("server.id"))
+  server = sao.relationship("Server", back_populates="roles")
 
   def __repr__(self):
     return f"<Role(pseudo='{self.pseudo}')>"
@@ -117,19 +117,24 @@ def _query_server(server:discord.Guild, session):
   query = query.filter(Server.id == server.id)
   return query
 
-def has_role(role:discord.Role):
-  return get_role(role) != None
+def has_role(role:discord.Role, server:discord.Guild=None):
+  return get_role(role, server) != None
 
-def get_role(role:discord.Role, session=None):
+def get_role(role:discord.Role, server:discord.Guild=None, session=None):
   if session is None:
     with Session() as session:
-      return get_role(role, session)
+      return get_role(role, server, session)
   ## would it be better to do a `session.get(role, role.id)` ??
-  return _query_role(role, session).first()
+  return _query_role(role, server, session).first()
 
-def _query_role(role:discord.Role, session):
+def _query_role(role:discord.Role, server:discord.Guild=None, session=None):
+  if session is None:
+    with Session() as session:
+      return _query_role(role, server, session)
   query = session.query(Role)
   query = query.filter(Role.id == role.id)
+  if server:
+    query = query.filter(Role.server_id == server.id)
   return query
 
 def has_auto_ban(member:discord.Member):
@@ -152,16 +157,16 @@ def create_member(member:discord.Member, session=None):
       f" got {type(member)}"
     )
   server = member.guild
-  database_logger.debug(f"Creating member for id={member.id}...")
   if has_member(member):
     database_logger.debug(f"Member {member.id} already exists.")
     return get_member(member, session)
+  database_logger.debug(f"Creating member for id={member.id}...")
   db_member, created = get_or_create(session, Member, id=member.id)
-  if not has_server(server):
-    database_logger.debug(f"Member's server {server.id} does not exist yet.")
-    db_server = create_server(server, session)
-  else:
-    db_server = get_server(server, session)
+  db_server = create_server(server, session)
+  # if not has_server(server):
+  #   database_logger.debug(f"Member's server {server.id} does not exist yet.")
+  # else:
+  #   db_server = get_server(server, session)
   db_member.servers.append(db_server)
   database_logger.debug(f"Member added to server {server.id}.")
   session.add(db_member)
@@ -169,16 +174,32 @@ def create_member(member:discord.Member, session=None):
   database_logger.debug(f"Member created.")
   return db_member
 
-def assign_role(member:discord.Member, role:discord.Role, session):
+def assign_role(
+  member:discord.Member,
+  role:discord.Role,
+  session=None
+):
+  if session is None:
+    with Session() as session:
+      return assign_role(member, role, session)
+  server = member.guild
   db_member = create_member(member, session)
-  db_role = create_role(role, session)
+  db_role = create_role(role, server, session)
   if db_role not in db_member.roles:
     db_member.roles.append(db_role)
   session.commit()
 
-def remove_role(member:discord.Member, role:discord.Role, session):
+def remove_role(
+  member:discord.Member,
+  role:discord.Role,
+  session=None
+):
+  if session is None:
+    with Session() as session:
+      return remove_role(member, role, session)
+  server = member.guild
   db_member = create_member(member, session)
-  db_role = create_role(role, session)
+  db_role = create_role(role, server, session)
   if db_role in db_member.roles:
     db_member.roles.remove(db_role)
   session.commit()
@@ -192,30 +213,40 @@ def create_server(server:discord.Guild, session=None):
       f"Bad server type: expected discord.Guild instance,"
       f" got {type(server)}"
     )
-  database_logger.debug(f"Creating server for id={server.id}...")
   if has_server(server):
     database_logger.debug(f"Server {server.id} already exists.")
     return get_server(server, session)
-  db_server = Server(id=server.id)
+  database_logger.debug(f"Creating server for id={server.id}...")
+  db_server = Server(id=server.id, name=server.name)
   session.add(db_server)
   session.commit()
   database_logger.debug(f"Server created.")
   return db_server
 
-def create_role(role:discord.Role, session=None):
+def create_role(
+  role:discord.Role,
+  server:discord.Guild,
+  session=None
+)->Role:
   if session is None:
     with Session() as session:
-      return create_role(role, session)
+      return create_role(role, server, session)
   if not isinstance(role, discord.Role):
     raise TypeError(
       f"Bad role type: expected discord.Role instance,"
       f" got {type(role)}"
     )
-  database_logger.debug(f"Creating role for id={role.id}...")
-  if has_role(role):
-    database_logger.debug(f"role {role.id} already exists.")
-    return get_role(role, session)
-  db_role = Role(id=role.id)
+  if not isinstance(server, discord.Guild):
+    raise TypeError(
+      f"Bad server type: expected discord.Guild instance,"
+      f" got {type(server)}"
+    )
+  if has_role(role, server):
+    database_logger.debug(f"Role {role.id} already exists in {server.name}.")
+    return get_role(role, server, session)
+  database_logger.debug(f"Creating role for id={role.id} in {server.name}...")
+  db_server = create_server(server, session)
+  db_role = Role(id=role.id, server=db_server, name=role.name)
   session.add(db_role)
   session.commit()
   database_logger.debug(f"Role created.")
