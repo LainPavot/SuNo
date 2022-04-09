@@ -18,6 +18,7 @@ modules = [
   suno.modules.NewMembers,
   suno.modules.ReactionMessage,
   suno.modules.DebugModule,
+  suno.modules.ManagementModule,
 ]
 
 for module in modules:
