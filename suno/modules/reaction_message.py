@@ -6,7 +6,7 @@ import suno.database
 import suno.module
 
 
-def pair_of_reaction_role(message:discord.Message, args, parsed):
+def pair_of_reaction_role(message:discord.Message, args):
   args = args[1:]
   if not args:
     return False
@@ -29,7 +29,7 @@ class ReactionMessage(suno.module.SuNoModule):
     " qui déclancheront des actions données."
   )
 
-  test_command_info = dict(
+  command_info = dict(
     gives_role=dict(
       all_args=(pair_of_reaction_role, ),
       before_args=lambda x:(x["message"], ),
@@ -41,9 +41,9 @@ class ReactionMessage(suno.module.SuNoModule):
         "\nFaites bien attention à mettre les noms des roles entre guillemets"
         " si ceux-si sont en plusieurs mots!"
       ),
-      # perms=dict(
-      #   role=("TUTU", )
-      # ),
+      perms=dict(
+        role=("ROLE_CONFIANCE_HAUTE", )
+      ),
     )
   )
 

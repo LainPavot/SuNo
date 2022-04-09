@@ -15,7 +15,7 @@ class DebugModule(suno.module.SuNoModule):
     " informer les personnes des informations que la bot a sur ces personnes."
   )
 
-  test_command_info = dict(
+  command_info = dict(
     db=dict(args=tuple()),
     user=dict(args=suno.command.args.mention)
   )

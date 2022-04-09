@@ -5,7 +5,7 @@ import collections
 import suno.utils
 
 
-_command_args = ("string", "mention", "role_id", "role_name", "reaction")
+_command_args = ("string", "mention", "role_id", "role_name", "reaction", "role")
 args = collections.namedtuple(
   "CommandArgs",
   _command_args,

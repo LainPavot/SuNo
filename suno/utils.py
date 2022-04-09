@@ -109,10 +109,16 @@ def extract_id(message, as_int=False):
     return None
 
 def role_to_code(conf, guild:discord.Guild, role):
-  return conf.ROLE_NAME_TO_CODE.get(guild.id, {}).get(role.name)
+  return role_name_to_code(conf, guild, role.name)
+
+def code_to_role(conf, guild:discord.Guild, code):
+  return role_name_to_role(guild, code_to_role_name(conf, guild, code))
 
 def code_to_role_name(conf, guild:discord.Guild, code):
   return conf.ROLE_CODE_TO_NAME.get(guild.id, {}).get(code)
+
+def role_name_to_code(conf, guild:discord.Guild, name):
+  return conf.ROLE_NAME_TO_CODE.get(guild.id, {}).get(name)
 
 def role_name_to_role(guild, role_name):
   for role in guild.roles:

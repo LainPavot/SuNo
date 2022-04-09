@@ -171,7 +171,7 @@ class SuNoModule:
         self.logger.debug(f"param \"{original_param}\" ({parameter}) not matched!")
         return False
     for checker in cmd_info.get("all_args", tuple()):
-      result = checker(*before_args, args, parsed_params)
+      result = checker(*before_args, args)
       if not isinstance(result, bool):
         if isinstance(result, str):
           await self.send_message(message.channel, result)
@@ -183,8 +183,10 @@ class SuNoModule:
 
   def extract_command_meta_info(self, args):
     for arg in args:
-      if re.match(r"<@[!&]?\d{18}>", arg):
+      if re.match(r"<@\d{18}>", arg):
         yield suno.command.args.mention
+      if re.match(r"<@&\d{18}>", arg):
+        yield suno.command.args.role
       yield suno.command.args.string
 
   async def run_command_check_perm(self, message, command, args):
@@ -205,12 +207,17 @@ class SuNoModule:
 
   def check_perms(self, user, command):
     command_info = self.command_info[command]
-    if not (roles := command_info.get("perms", {}).get("role")):
+    if not (role_metanames := command_info.get("perms", {}).get("role")):
       return True
-    roles = set([self.get_role(user.guild, role) for role in roles])
+    role_codes = [
+      getattr(self.config, role_metaname)
+      for role_metaname in role_metanames
+    ]
+    roles = set([
+      suno.utils.code_to_role(self.config, user.guild, role_code)
+      for role_code in role_codes
+    ])
     return set(user.roles) & roles
-
-    return True
 
   async def _command_help(self, message, command, args):
     await self.send_message(
