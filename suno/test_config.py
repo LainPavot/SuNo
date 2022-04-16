@@ -7,9 +7,14 @@ SERVERS:tuple = (
   PLATIPUS_SERVER,
 )
 
+AUTO_ROLES = {
+  MAIN_SERVER: ("sdl", 962400828801572964),
+  PLATIPUS_SERVER: ("platipus", 962418121589792889),
+}
+
 OVERWRITES_ROLES:bool = True
 
-
+GENERIC_NAME_HAUTE_CONFIANCE = "platipus"
 
 ### Those are just constantes to use in the code.
 ### Their value should not be important.

@@ -21,6 +21,27 @@ def equals(*_args):
     return sorted(_args) == sorted(args)
   return eq_args
 
+def at_least(number):
+  def matches_args(are):
+    def matches_checker(*args):
+      return are(*args[number:])
+    return matches_selector
+  return matches_args
+
+def are(what):
+  def matches_args(*args):
+    return all(map(what.__eq__, args))
+  return matches_args
+
+def sliced(start, stop=None, sep=1):
+  def matches_args(are):
+    def matches_checker(*args):
+      if stop is None:
+        stop = len(args)
+      return are(*args[slice(start, stop, sep)])
+    return matches_checker
+  return matches_args
+
 def arg_is_role(*args):
   return arg_is_role_id(*args) or arg_is_role_name(*args)
 

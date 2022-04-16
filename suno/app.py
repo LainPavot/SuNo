@@ -3,16 +3,19 @@
 import asyncio
 import logging
 import os
+import typing
 
 import discord
 
 import suno.config
 import suno.database
+import suno.module
 import suno.sync
 import suno.utils
 
 
 logger = suno.utils.get_logger(__name__, filename=f"logs/{__name__}.log", noprint=True)
+
 
 
 class App(discord.Client):
@@ -29,7 +32,13 @@ class App(discord.Client):
       setattr(self, action, getattr(self.role_sync, action))
     super().__init__(*args, **kwargs)
 
-  def register(self, module):
+  def find_module(self, name:str) -> typing.Optional[suno.module.SuNoModule]:
+    for module in self._modules:
+      if module.name == name:
+        return module
+    return None
+
+  def register(self, module:suno.module.SuNoModule):
     """
     Registers a SuNo Module
     Module must inherit from SuNoModule
@@ -133,3 +142,76 @@ class App(discord.Client):
     if dev:
       self.set_dev_mode(*args, **kwargs)
     super().run(self.token)
+
+
+class DevApp(App):
+  async def on_guild_available(self, guild, *args, **kwargs):
+    await super().on_guild_available(guild, *args, **kwargs)
+
+    if guild.id in self.config.AUTO_ROLES:
+      guild_name, chan_id = self.config.AUTO_ROLES[guild.id]
+      await self.prepare_managed_roles(guild, chan_id)
+      await getattr(self, f"start_{guild_name}")(guild, chan_id)
+
+  async def prepare_managed_roles(self, guild, chan_id):
+    code2name = self.config.ROLE_CODE_TO_NAME[guild.id]
+    texts = [(
+      "Auto roles de confiance (devraient se syncroniser avec les "
+      "autres serveurs):"
+    )]
+    args_list = [(
+      "💜", code2name[self.config.ROLE_CONFIANCE_HAUTE],
+      "❤️", code2name[self.config.ROLE_CONFIANCE_MOYENNE],
+      "💙", code2name[self.config.ROLE_CONFIANCE_BASSE],
+    )]
+    await self.prepare_auto_role(
+      guild,
+      chan_id,
+      texts,
+      args_list,
+      purge=True
+    )
+
+  async def start_platipus(self, guild, chan_id):
+    pass
+
+  async def start_sdl(self, guild, chan_id):
+    ## Serveur de Lainou#auto-role
+    texts = [(
+      "Reagissez avec l'une de emote pour obtenir "
+      "la couleur correspondante.\n"
+      "Réagissez à nouveau avec l'emote pour vous l'enlever."
+    )]
+    args_list = [(
+      "💜", "purple", "💙", "blue", "💚", "green",
+      "💛", "yellow", "🧡", "orange", "❤️", "red"
+    )]
+    await self.prepare_auto_role(guild, chan_id, texts, args_list)
+
+  async def prepare_auto_role(
+    self,
+    guild,
+    chan_id,
+    texts,
+    args_list,
+    purge=False
+  ):
+    if not (mod := self.find_module("ReactionMessage")):
+      return
+    chan = guild.get_channel(chan_id)
+    if purge:
+      await chan.purge()
+    for text, args in zip(texts, args_list):
+      await self.send_gives_role(chan, mod, text, args)
+
+  async def send_gives_role(self, chan, mod, text, args):
+    msg = await mod.send_message(
+      chan,
+      f"!react gives_role \"{text}\"\n"
+      + '\n'.join(
+        f"{heart} {color}"
+        for heart, color in zip(args[::2], args[1::2])
+      ),
+      return_message=True
+    )
+    await mod._command_gives_role(msg, "gives_role", (text, *args))

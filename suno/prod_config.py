@@ -1,6 +1,20 @@
 
-MAIN_SERVER:int = 987654321
-SERVERS:tuple = (MAIN_SERVER, )
+ZAD_SERVER:int = 909921769530462229
+PROMENAME_SERVER:int = 779065408191594520
+CONSEIL_SERVER:int = 779104471929585674
+LABO_SERVER:int = 909928095908253726
+SOURCES_SERVER:int = 909928095908253726
+PELUCHE_SERVER:int = 909928095908253726
+SERVERS:tuple = (
+  ZAD_SERVER,
+  PROMENAME_SERVER,
+  CONSEIL_SERVER,
+  LABO_SERVER,
+  SOURCES_SERVER,
+  PELUCHE_SERVER,
+)
+
+GENERIC_NAME_HAUTE_CONFIANCE = "turquoise"
 
 
 ### Those are just constantes to use in the code.
@@ -11,9 +25,34 @@ ROLE_CONFIANCE_BASSE:str = "3"
 
 ROLE_NAME_TO_CODE = {
   ### roles names for __this specific__ server
-  MAIN_SERVER: {
-    "role_confiance_haute": ROLE_CONFIANCE_HAUTE,
-    "role_confiance_moyenne": ROLE_CONFIANCE_MOYENNE,
-    "role_confiance_basse": ROLE_CONFIANCE_BASSE,
-  }
+  ZAD_SERVER: {
+    "💠 Turquoise": ROLE_CONFIANCE_HAUTE,
+    "Phosphate d'Alumine +": ROLE_CONFIANCE_MOYENNE,
+    "Phosphate d'Alumine": ROLE_CONFIANCE_BASSE,
+  },
+  PROMENAME_SERVER: {
+    "Turquoise": ROLE_CONFIANCE_HAUTE,
+    "Phosplate plus": ROLE_CONFIANCE_MOYENNE,
+    "Phosphate d'alumine": ROLE_CONFIANCE_BASSE,
+  },
+  CONSEIL_SERVER: {
+    "architecte": ROLE_CONFIANCE_HAUTE,
+    "inspecteurice des travaux finis": ROLE_CONFIANCE_MOYENNE,
+    "": ROLE_CONFIANCE_BASSE,
+  },
+  LABO_SERVER: {
+    "Turquoise": ROLE_CONFIANCE_HAUTE,
+    "Phosplate +": ROLE_CONFIANCE_MOYENNE,
+    "Phosphate d'Alumine": ROLE_CONFIANCE_BASSE,
+  },
+  SOURCES_SERVER: {
+    "": ROLE_CONFIANCE_HAUTE,
+    "": ROLE_CONFIANCE_MOYENNE,
+    "": ROLE_CONFIANCE_BASSE,
+  },
+  PELUCHE_SERVER: {
+    "": ROLE_CONFIANCE_HAUTE,
+    "": ROLE_CONFIANCE_MOYENNE,
+    "": ROLE_CONFIANCE_BASSE,
+  },
 }

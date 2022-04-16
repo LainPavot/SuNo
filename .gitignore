@@ -1,6 +1,6 @@
 /.venv/
 /suno.egg-info/
-/.token
+/.token*
 *.log
 /.pytest_cache/
 /suno.sublime-project

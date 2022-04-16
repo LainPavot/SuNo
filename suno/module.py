@@ -118,9 +118,26 @@ class SuNoModule:
       self.logger.debug(f"There is no system channel. Cannot send message.")
     return False
 
-  async def send_message(self, channel, to_send):
+  async def send_message(self, channel, to_send, return_message=False):
     self.logger.debug(f"[discord] Sending message \"{to_send}\" in {channel.name}.")
-    await channel.send(to_send)
+    msg = await channel.send(to_send)
+    if return_message:
+      return msg
+    return True
+
+  async def send_tmp_message(self, *args, ttw=10, **kwargs):
+    msg = await self.send_message(*args, **kwargs, return_message=True)
+    self.loop.create_task(
+      self.delete_message_after(msg, ttw)
+    )
+    return True
+
+  async def delete_message_after(self, message, ttw):
+    original_message = message.content
+    for i in reversed(range(ttw)):
+      await message.edit(content=f"{original_message}\n(deleted in {i}s)")
+      await asyncio.sleep(1)
+    await message.delete()
     return True
 
   def logger_debug_function(self, message):
@@ -220,27 +237,41 @@ class SuNoModule:
     return set(user.roles) & roles
 
   async def _command_help(self, message, command, args):
-    await self.send_message(
-      message.channel,
-      self._build_module_md_help()
+    help_msg = self._build_module_md_help()
+    help_msg = self.replace_help_placeholders(
+      help_msg,
+      message.channel.guild
     )
+    await self.send_message(message.channel, help_msg)
 
   async def _command_all_helps(self, message):
-    await self.send_message(
-      message.channel,
-      self._build_all_modules_md_help()
+    help_msg = self._build_all_modules_md_help()
+    help_msg = self.replace_help_placeholders(
+      help_msg,
+      message.channel.guild
     )
+    await self.send_message(message.channel, help_msg)
+
+  def replace_help_placeholders(self, help_msg, guild):
+    def code_to_role(code):
+      return suno.utils.code_to_role(self.config, guild, code)
+    return help_msg.format(**dict(
+      role_confiance_haute=code_to_role(self.config.ROLE_CONFIANCE_HAUTE),
+      role_confiance_moyenne=code_to_role(self.config.ROLE_CONFIANCE_MOYENNE),
+      role_confiance_basse=code_to_role(self.config.ROLE_CONFIANCE_BASSE),
+    ))
 
   def _build_module_md_help(self):
-    return "\n".join((
-      f"```markdown",
+    help_msg = "\n".join((
+      f"```", # markdown
       self._build_module_raw_help(),
       f"```",
     ))
+    return help_msg
 
   def _build_all_modules_md_help(self):
-    return "\n".join((
-      "```markdown",
+    help_msg = "\n".join((
+      "```", # markdown
       f"{self.config.LOAD_COMMAND}: load the server.",
       "\n".join(
         f"!{module.command_prefix} help"
@@ -249,6 +280,7 @@ class SuNoModule:
       ),
       "```",
     ))
+    return help_msg
 
   def _build_module_raw_help(self):
     commands_help = "\n".join(
