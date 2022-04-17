@@ -1,4 +1,9 @@
 
+import os
+
+
+if not os.path.exists("logs"):
+  os.mkdir("logs")
 
 import click
 import discord
@@ -21,7 +26,6 @@ intents = discord.Intents.all()
 
 
 def build_app(token, pidfile, dev=False):
-
   if dev:
     app_factory = suno.app.DevApp
   else:

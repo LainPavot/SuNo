@@ -209,7 +209,8 @@ class ReactionMessage(suno.module.SuNoModule):
     )
     return await self.create_role_vote(message, command, args, role)
   
-  async def self.create_role_vote(self, message, command, args, role):
+  async def create_role_vote(self, message, command, args, role):
+    pass
 
 
   async def _command_vote(self, message, command, args, end_count=-1):
