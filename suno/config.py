@@ -11,6 +11,8 @@ LOAD_COMMAND:str = "!app load"
 
 TEST:bool = True
 
+AUTO_ROLES = dict()
+
 if TEST:
   from suno.test_config import *
 
