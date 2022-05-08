@@ -61,7 +61,13 @@ class ReactionMessage(suno.module.SuNoModule):
       all_args=(
         suno.command.args.mention,
       ),
-      help="Déclanche un vote pour assinger le role de \"{role_confiance_haute.name}\""
+      help=(
+        "Déclanche un vote pour assinger le role de"
+        "\"{role_confiance_haute.name}\""
+      ),
+      perms=dict(
+        role=("ROLE_CONFIANCE_HAUTE", )
+      ),
     )
   )
 
