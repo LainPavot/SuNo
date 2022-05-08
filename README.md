@@ -1,12 +1,12 @@
 
-TiCu - V2
+Supernova
 =========
 
-The python version of the TiCu bot. The bot itself is contained in the
-[suno](tidu) directory.
+The python version of the Supernova bot. The bot itself is contained in the
+[suno](suno) directory.
 
-The [setup.py](setup.py) file serves the purpose of describing the packagem it's associated
-python version and other metadata.
+The [setup.py](setup.py) file serves the purpose of describing the package,
+it's associated python version and other metadata.
 
 Commands
 ========
@@ -51,5 +51,5 @@ terminal. The pidfile is not written, but your token is still needed.
 Metadata
 ========
 
- * **@author**: The Tipoui community
+ * **@author**: The Ex-Tipoui community
  * **@creation data**: 17/03/2022
