@@ -48,6 +48,36 @@ Like start, but runs the bot in foreground. The logs are then visible in the
 terminal. The pidfile is not written, but your token is still needed.
 
 
+
+commands to deploy
+===
+ * `git reset --hard`
+ * `git pull --rebase`
+ * remove logs if necessary
+ * `vi suno/config.py ## set debug to False`
+ * `make kill start`
+
+zad
+---
+```
+!react gives_role "Réagissez pour vous (dés-)assigner les roles:
+** **
+**Non-mixités**
+** **
+🖤 - Racisæ
+🇫 - Féminisme
+♿  - Handi
+🎭 - Neuro-divergent·e
+🐱 - Système multiple
+🇰 - Alterhumainæ/otherkin
+🇳 - Non-binaire
+🏳️‍⚧️ - Trans
+🏹 - Aro-ace 
+" 🖤 "Racisæ" 🇫 "Féminisme" ♿ "Handi" 🎭 "Neuro-divergent·e" 🐱 "Système multiple" 🇰 "Alterhumainæ/otherkin" 🇳 "Non-binaire" 🏳️‍⚧️ "Trans" 🏹 "Aro-ace"
+```
+
+
+
 Metadata
 ========
 
