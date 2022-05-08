@@ -53,7 +53,7 @@ stop:
 	fi
 
 kill:
-	@echo "Killing all instances of TiCu"
+	@echo "Killing all instances of Supernova"
 	@-killall suno
 
 .PHONY:tests/test_* test-function-*
