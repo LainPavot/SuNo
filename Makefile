@@ -18,7 +18,7 @@ $(VENV_DIR):
 	@python3 -m virtualenv $(VENV_DIR)
 
 start:
-	@$(ACTIVATE) && suno run --token=$$(cat .token) --pidfile=$(PIDFILE) &
+	@nohup sh -c "$(ACTIVATE) && suno run --token=$$(cat .token) --pidfile=$(PIDFILE) 2>&1 &"
 
 dev:
 	@$(ACTIVATE) && suno run --token=$$(cat .token) --pidfile=$(PIDFILE) --dev
