@@ -155,15 +155,19 @@ class DevApp(App):
 
   async def prepare_managed_roles(self, guild, chan_id):
     code2name = self.config.ROLE_CODE_TO_NAME[guild.id]
-    texts = [(
-      "Auto roles de confiance (devraient se syncroniser avec les "
-      "autres serveurs):"
-    )]
     args_list = [(
       "💜", code2name[self.config.ROLE_CONFIANCE_HAUTE],
       "❤️", code2name[self.config.ROLE_CONFIANCE_MOYENNE],
       "💙", code2name[self.config.ROLE_CONFIANCE_BASSE],
     )]
+    texts = [
+      "Auto roles de confiance (devraient se syncroniser avec les "
+      "autres serveurs):\n"
+      + "\n".join(
+        f"{emote}: {name}"
+        for emote, name in zip(args_list[0][::2], args_list[0][1::2])
+      )
+    ]
     await self.prepare_auto_role(
       guild,
       chan_id,
