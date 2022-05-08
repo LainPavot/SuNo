@@ -20,16 +20,18 @@ class NewMembers(suno.module.SuNoModule):
   )
 
   welcome_message = """
-  {user.mention}, bienvenu sur {guild.name}.
+  Bonjour et bienvenue {user.mention} !
+Pour pouvoir rentrer, nous te demandons de nous faire une petite présentation, qui devra inclure où tu as connu le serveur, pourquoi tu l'as rejoint, une confirmation que tu as lu et accepté les règles, et n'importe quoi d'autre que tu jugeras utile
+Nous te demandons de mettre également tes pronoms dans ton pseudo
+Merci et bonne journée
   """
 
   welcome_back_message = """
-  {user.mention}, bon retour sur {guild.name}.
+  Bonjour {user.mention}, et bon retour sur {guild.name} !
   """
 
   async def on_ready(self, *args, **kwargs):
     await super().on_ready(*args, **kwargs)
-    print(suno.database.Session())
     return False
 
   async def on_member_join(self, member):
