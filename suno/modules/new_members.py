@@ -72,8 +72,16 @@ Merci et bonne journée
       guild = member.guild
     if back:
       message = self.welcome_back_message
+      # message = self.config.WELCOME_MESSAGES.get(
+      #   member.guild.id,
+      #   self.config.DEFAULT_WELCOME_MESSAGE
+      # )
     else:
-      message = self.welcome_message
+      # message = self.welcome_message
+      message = self.config.WELCOME_MESSAGES.get(
+        member.guild.id,
+        self.config.DEFAULT_WELCOME_MESSAGE
+      )
     to_send = message.format(user=member, guild=guild)
     if not await self.send_to_system_channel(guild, to_send):
       if (channel := self._find_appropriate_random_channel(guild)):
