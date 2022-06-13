@@ -6,6 +6,7 @@ from logging import handlers
 import contextlib
 import logging
 import os
+import random
 import re
 import sys
 import typing
@@ -157,3 +158,7 @@ def role_to_code_to_role(
     )
     return None
   return output_role
+
+
+def random_heart(n=1):
+  return ''.join(random.choice(("💜", "💙", "💚", "💛", "🧡", "❤️ ")) for _ in range(n))

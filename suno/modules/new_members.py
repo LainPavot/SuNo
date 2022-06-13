@@ -1,10 +1,13 @@
 
 
+import datetime
+
 import discord
 
 import suno.command
 import suno.database
 import suno.module
+import suno.utils
 
 
 class NewMembers(suno.module.SuNoModule):
@@ -18,6 +21,9 @@ class NewMembers(suno.module.SuNoModule):
       args=(suno.command.contains(suno.command.args.mention), )
     )
   )
+
+  delay_after_upgrade_confidence = datetime.timedelta(days=30)
+  delay_after_upgrade_confidence_string = "30 jours"
 
   welcome_message = """
   Bonjour et bienvenue {user.mention} !
@@ -42,6 +48,41 @@ Merci et bonne journée
     no_process = await handler(member)
     self.logger_debug_function(f"No process flag is {no_process}")
     return no_process
+
+  async def on_message(self, message, *args, **kwargs):
+    member = message.author
+    if (
+      not hasattr(member, "joined_at")
+      or not (joined_at := member.joined_at)
+    ):
+      return ## not a guild member; DM
+    lapse = datetime.datetime.now() - joined_at
+    if lapse < self.delay_after_upgrade_confidence:
+      return ## joined less than 30 days ago
+    new_role_name = suno.utils.code_to_role_name(
+      self.config,
+      member.guild,
+      self.config.ROLE_CONFIANCE_MOYENNE
+    )
+    for curent_role in member.roles:
+      if curent_role.name == new_role_name:
+        ## the user has already this role, baka!
+        return
+
+    roles = await member.guild.fetch_roles()
+    if not (filtered := [role for role in roles if role.name == new_role_name]):
+      self.logger.warning(
+        f"Tried to find role {new_role_name} on server {member.guild.name}, "
+        "but could not find it!"
+      )
+      return
+    role = filtered[0]
+    await message.reply(
+      f"Félicitation! Ça fait {self.delay_after_upgrade_confidence_string} "
+      f"que tu es sur le serveur!\n"
+      f"Te voilà maintenant {role.name} {suno.utils.random_heart()}"
+    )
+    await self.manage_role("add", member, role)
 
   async def handle_member_coming_back(self, member):
     if suno.database.has_auto_ban(member):
